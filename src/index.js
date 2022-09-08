@@ -1,17 +1,43 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React, { useState } from 'react';
+import { render } from 'react-dom';
+import Header from './Header.jsx';
+import Movie from './Movie.jsx'
+import './styles/buttons.scss'
+import Modal from './Modal'
+import './styles/index.scss'
+import Cart from './Cart'
+import { BrowserRouter, Switch, Route, useLocation } from 'react-router-dom'
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
+const Index = () => {
+  const [basket, updateBasket] = useState([])
+  const [isBasketActive, toggleBasket] = useState(false)
+  const location = useLocation();
+  const background = location.state && location.state.background;
+
+  return (
+    <>
+      <Switch location={background || location}>
+        <Route exact path='/'>
+          <Header basket={basket} toggleBasket={toggleBasket} isBasketActive={isBasketActive} />
+          <Movie updateBasket={updateBasket} basket={basket} genre={['Action', 'Horror']} />
+
+          <Cart isBasketActive={isBasketActive} updateBasket={updateBasket} toggleBasket={toggleBasket} basket={basket} />
+        </Route>
+        <Route component={() => (
+          <div>Page not found</div>
+        )} />
+      </Switch>
+      {background && <Route path="/modal" children={<Modal />} />}
+    </>
+  );
+}
+
+render(
+  <BrowserRouter>
+    <Index />
+  </BrowserRouter>
+
+  ,
+  document.getElementById('root')
 );
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
